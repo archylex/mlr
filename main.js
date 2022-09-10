@@ -6,7 +6,7 @@ const y = [40,60,70,60,47,59,66,90,112,112, 139];
 
 
 const mlr = new MLRServer(y, x1, x2);
-mlr.getGraph(600,300,true, true);
+mlr.getGraph(600,300, true, true);
 
 console.log('Data');
 console.log('y:  |',y.join` | `);
@@ -50,10 +50,12 @@ const htmlPredictY = mlr.matrixPredictY.getHTML();
 console.log ('formula with coefs:');
 console.log(mlr.formula);
 
-const xt = [1,2];
+const xt = [10,6];
 console.log ('\n');
 console.log('equation: ',mlr.equation(xt));
 console.log('y =', mlr.predict(xt));
+
+
 
 
 

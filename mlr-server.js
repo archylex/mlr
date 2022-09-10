@@ -8,41 +8,27 @@ module.exports =  class MLRServer {
 
         this.matrixY = new Matrix(y).transpose();
 
-        // connect x's into one array.
-        const newX = [];
+        this.matrixX = new Matrix(x[x.length - 1]).transpose();
 
-        for (let column = 0; column < x[0].length; ++column) {
-            newX[column] = [];
-            newX[column][0] = 1;
-
-            for (let row = 0; row < x.length; ++row) {
-                newX[column][row + 1] = x[row][column];
-            }
+        for (let i = 0; i < x.length - 1; ++i) {
+            this.matrixX.addColumn(x[i]);
         }
 
-        this.matrixX = new Matrix(newX);
+        this.matrixX.addColumn(new Array(this.matrixX.array.length).fill(1));
+        this.matrixX.swapColumn(0, x.length);
 
-        // Xtranspose
+        // transpose X
         this.tX = this.matrixX.transpose();
         // Xt * X
         this.tXX = this.tX.multiply(this.matrixX);
-        // inverse Xt * X
+        // inverse (Xt * X)
         this.inverseTXX = this.tXX.inverse();
         // Xt * Y
         this.tXY = this.tX.multiply(this.matrixY);
-        // (Xt*X)^-1 * Xt*Y
+        // (Xt*X)^-1 * (Xt*Y)
         this.matrixK = this.inverseTXX.multiply(this.tXY);
 
-        // predict Y
-        const py = [];
-        for (let i = 0; i < this.matrixX.array.length; ++i) {
-            const px = [];
-            for (let j = 1; j < this.matrixX.array[i].length; ++j) {
-                px[j-1] = this.matrixX.array[i][j];
-            }
-            py.push(this.predict(px));
-        }
-        this.matrixPredictY = new Matrix(py);
+        this.fillPredictY();
 
         this.predictColor = '#ff0000';
         this.realColor = '#0000ff';
@@ -52,6 +38,32 @@ module.exports =  class MLRServer {
         this.predictLine = 2;
     }
 
+    /**
+     * Fills array Y with predictions.
+     */
+    fillPredictY() {
+        const y = [];
+
+        for (let i = 0; i < this.matrixX.array.length; ++i) {
+            const x = [];
+
+            for (let j = 1; j < this.matrixX.array[i].length; ++j) {
+                x[j-1] = this.matrixX.array[i][j];
+            }
+
+            y.push([this.predict(x)]);
+        }
+
+        this.matrixPredictY = new Matrix(y);
+    }
+
+    /**
+     * Data Validation.
+     * Throws an error if the data does not match requirements.
+     *
+     * @param{array} y The array of observed data.
+     * @param{array} x The array of observed data.
+     */
     isValid(y, x) {
         let arrayLength = 0;
 
@@ -78,6 +90,11 @@ module.exports =  class MLRServer {
         }
     }
 
+    /**
+     * Derive an equation with substituted coefficients only.
+     *
+     * @return{string} y Equation.
+     */
     get formula() {
         let string = `y = ${this.matrixK.array[0]}`;
         for (let i = 1; i < this.matrixK.array.length; ++i) {
@@ -86,6 +103,13 @@ module.exports =  class MLRServer {
         return string;
     }
 
+    /**
+     * Derive an equation with substituted x's and coefficients.
+     *
+     * @param{array} x The array of observed data.
+     *
+     * @return{string} y Equation.
+     */
     equation(x) {
         let y = `${this.predict(x)} = ${this.matrixK.array[0]}`;
 
@@ -96,6 +120,13 @@ module.exports =  class MLRServer {
         return y;
     }
 
+    /**
+     * Prediction from observed data.
+     *
+     * @param{array} x The array of observed data.
+     *
+     * @return{number} y Prediction.
+     */
     predict(x) {
         if (x.length !== this.matrixK.array.length - 1) {
             throw new Error('Not enough X\'s.');
@@ -110,6 +141,16 @@ module.exports =  class MLRServer {
         return y;
     }
 
+    /**
+     * Create image file with graph
+     *
+     * @param{number} width Canvas width
+     * @param{number} height Canvas height
+     * @param{Boolean} isReal Draw a graph based on observation data.
+     * @param{Boolean} isPredict Draw a graph based on prediction data.
+     *
+     * @return{string} filename Filename of image.
+     */
     getGraph(width, height, isReal, isPredict) {
         const filename = 'graph.png';
         const canvas = createCanvas(width, height);
@@ -158,9 +199,9 @@ module.exports =  class MLRServer {
             draw(this.matrixY.array, context, this.realLine, this.realRadius, this.realColor);
         }
 
-        if (isPredict) {
+        if (isPredict) {console.log('red')
             const y = [];
-            draw(this.matrixPredictY, context, this.predictLine, this.predictRadius, this.predictColor);
+            draw(this.matrixPredictY.array, context, this.predictLine, this.predictRadius, this.predictColor);
         }
 
         const buffer = canvas.toBuffer('image/png');

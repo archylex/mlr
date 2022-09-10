@@ -1,8 +1,33 @@
 module.exports = class Matrix {
-    constructor(array) {
-        this.validation(array);
-
+    /**
+     * Set matrix size info
+     */
+    #setSize() {
         this.size = `${this.array.length}x${this.array[0].length}`;
+    }
+
+    /**
+     * Make 2D array from 1D array
+     *
+     * @param {array} array The array to be modified.
+     */
+    #to2d(array) {
+        if (Array.isArray(array[0])) return;
+
+        const tmp = [...array];
+
+        array.length = 0;
+        array.push(tmp);
+    }
+
+    constructor(array) {
+        this.array = [...array];
+
+        this.#to2d(this.array);
+
+        this.validation(this.array);
+
+        this.#setSize();
     }
 
     /**
@@ -21,10 +46,6 @@ module.exports = class Matrix {
             throw new Error('The array elements of different types.');
         }
 
-        if (!Array.isArray(array[0])) {
-            array = [array];
-        }
-
         if (!this.isOnlyNumbers(array)) {
             throw new Error('The array must contain only numbers.');
         }
@@ -32,8 +53,6 @@ module.exports = class Matrix {
         if (!this.isValidMatrix(array)) {
             throw new Error('The array must be two-dimensional.');
         }
-
-        this.array = array;
     }
 
     /**
@@ -69,7 +88,7 @@ module.exports = class Matrix {
     }
 
     /**
-     * Checking an array to contain only numbers.
+     * Checking an 2D array to contain only numbers.
      *
      * @param {array} array The array.
      * @return {Boolean} true or false.
@@ -250,6 +269,75 @@ module.exports = class Matrix {
         }
 
         return new Matrix(inv);
+    }
+
+    /**
+     * Add column to current matrix.
+     *
+     * @param{array} array The column.
+     */
+    addColumn(array) {
+        const tmp = new Matrix(array);
+
+        if (tmp.array[0].length !== this.array.length) {
+            throw new Error('The array length must be equal rows.');
+        }
+
+        for (let i = 0; i < this.array.length; ++i) {
+            this.array[i].push(tmp.array[0][i]);
+        }
+
+        this.#setSize();
+    }
+
+    /**
+     * Add row to current matrix.
+     *
+     * @param{array} array The row.
+     */
+    addRow(array) {
+        const tmp = new Matrix(array);
+
+        if (tmp.array[0].length !== this.array[0].length) {
+            throw new Error('The array length must be equal columns.');
+        }
+
+        this.array.push(tmp.array[0]);
+
+        this.#setSize();
+    }
+
+    /**
+     * Swaps columns A and B.
+     *
+     * @param{number} colA The column A.
+     * @param{number} colB The column B.
+     */
+    swapColumn(colA, colB) {
+        if (isNaN(colA) || isNaN(colB)) {
+            throw new Error('Column numbers must be specified.');
+        }
+
+        for (let i = 0; i < this.array.length; ++i) {
+            [this.array[i][colB], this.array[i][colA]] = [this.array[i][colA], this.array[i][colB]];
+        }
+    }
+
+    /**
+     * Remove column from current matrix.
+     *
+     * @param{number} n The number of column.
+     */
+    removeColumn(n) {
+        if (isNaN(n) || n < 0 || n > this.array.length) {
+            throw new Error('The column number is not correct.');
+        }
+
+        for (let i = 0; i < this.array.length; ++i) {
+            this.array[i].splice(n, 1);
+        }
+
+        this.#setSize();
     }
 
     /**
