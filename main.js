@@ -29,6 +29,7 @@ const htmlTX = mlr.tX.getHTML();
 console.log('X^T X');
 console.log(mlr.tXX.print());
 const htmlTXX = mlr.tXX.getHTML();
+console.log(mlr.traceSolution());
 
 console.log('(X^T X)^-1 [inverse matrix]');
 console.log(mlr.inverseTXX.print());

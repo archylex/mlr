@@ -39,6 +39,16 @@ module.exports =  class MLRServer {
     }
 
     /**
+     * Trace solution as HTML
+     *
+     * @return{string} HTML
+     */
+    traceSolution() {
+        const td = '<td style="vertical-align: center;">';
+        return `<table><tr><td><strong>X</strong>&nbsp;&nbsp;</td><td>=&nbsp;&nbsp;</td>${td}${this.matrixX.getHTML()}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Y</strong>&nbsp;&nbsp;=&nbsp;&nbsp;</td>${td}${this.matrixY.getHTML()}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;<strong>X<sup>T</sup></strong>&nbsp;&nbsp;</td><td>=&nbsp;&nbsp;</td>${td}${this.tX.getHTML()}</td></tr></table><br><table><tr><td><strong>X<sup>T</sup>X</strong>&nbsp;&nbsp;</td><td>=&nbsp;&nbsp;</td>${td}${this.tX.getHTML()}</td><td>&nbsp;&nbsp;</td>${td}${this.matrixX.getHTML()}</td><td>=&nbsp;&nbsp;</td>${td}${this.tXX.getHTML()}</td></tr></table><br><table><tr><td><strong>(X<sup>T</sup>X)<sup>-1</sup></strong>&nbsp;&nbsp;</td><td>=&nbsp;&nbsp;</td>${td}${this.tXX.getHTML(-1)}</td><td>=&nbsp;&nbsp;</td>${td}${this.inverseTXX.getHTML()}</td></tr></table><br><table><tr><td><strong>X<sup>T</sup>Y</strong>&nbsp;&nbsp;</td><td>=&nbsp;&nbsp;</td>${td}${this.tX.getHTML()}</td><td>&nbsp;&nbsp;</td>${td}${this.matrixY.getHTML()}</td><td>=&nbsp;&nbsp;</td>${td}${this.tXY.getHTML()}</td></tr></table><br><table><tr><td><strong>K</strong><strong>&nbsp;&nbsp;=&nbsp;&nbsp;(X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>Y</strong>&nbsp;&nbsp;</td><td>=&nbsp;&nbsp;</td>${td}${this.inverseTXX.getHTML()}</td><td>&nbsp;&nbsp;</td>${td}${this.tXY.getHTML()}</td><td>=&nbsp;&nbsp;</td>${td}${this.matrixK.getHTML()}</td></tr></table>`;
+    }
+
+    /**
      * Fills array Y with predictions.
      */
     fillPredictY() {
