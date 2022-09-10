@@ -341,71 +341,23 @@ module.exports = class Matrix {
     }
 
     /**
-     * Print the matrix to console.
+     * Get equation for MathJax.
      *
      * @return {string} string The formatted matrix string.
      */
-    print() {
-        let string = '┌─';
-
-        for (let i = 0; i < this.array[0].length - 1; ++i) {
-            string += '\t';
-        }
-
-        string += ' ─┐\n';
-
-        for (let row = 0; row < this.array.length; ++row) {
-            string += '│ ';
-
-            for (let column = 0; column < this.array[0].length; ++column) {
-                string += this.array[row][column] + '\t';
-            }
-
-            string = string.replace(/\t$/,'');
-            string += ' │\n';
-        }
-
-        string += '└─';
-
-        for (let i = 0; i < this.array[0].length - 1; ++i) {
-            string += '\t';
-        }
-
-        string += ' ─┘\n';
-
-        return string;
-    }
-
-    /**
-     * Get the matrix as an HTML table.
-     *
-     * @return {string} string The formatted matrix string.
-     */
-    getHTML(mark = '') {
-        let html = '<table style="border-collapse:collapse;"><tr><td style="width:15px;border-left: solid 2px black;border-top: solid 2px black;">&nbsp;</td>';
-
-        for (let i = 0; i < this.array[0].length; ++i) {
-            html +=  '<td></td>';
-        }
-
-        html += `<td style="width:15px;border-right: solid 2px black;border-top: solid 2px black;">&nbsp;</td><td>&nbsp;&nbsp;<b>${mark}</b></td></tr>`;
+    get equation() {
+        let string = '\\begin{bmatrix}';
 
         for (let i = 0; i < this.array.length; ++i) {
-            html += '<tr><td style="border-left: solid 2px black;">&nbsp;</td>';
             for (let j = 0; j < this.array[0].length; ++j) {
-                html += `<td>&nbsp;${this.array[i][j]}&nbsp;</td>`;
+                string += `${this.array[i][j]} & `;
             }
-            html += '<td style="border-right: solid 2px black;">&nbsp;</td></tr>';
+            string = string.slice(0, -3);
+            string += '\\\\';
         }
 
-        html += '<tr><td style="border-left: solid 2px black;border-bottom: solid 2px black;">&nbsp;</td>';
+        string += '\\end{bmatrix}'
 
-        for (let i = 0; i < this.array[0].length; ++i) {
-            html +=  '<td></td>';
-        }
-
-        html += '<td style="border-right: solid 2px black;border-bottom: solid 2px black;">&nbsp;</td></tr></table>';
-
-        return html;
+        return string;
     }
 }; 
