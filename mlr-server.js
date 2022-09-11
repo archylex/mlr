@@ -8,17 +8,12 @@ module.exports =  class MLRServer {
 
         this.matrixY = new Matrix(y).transpose();
 
-        this.matrixX = new Matrix(x[x.length - 1]).transpose();
+        x.unshift(new Array(x[0].length).fill(1));
 
-        for (let i = 0; i < x.length - 1; ++i) {
-            this.matrixX.addColumn(x[i]);
-        }
+        this.tX = new Matrix(x);
 
-        this.matrixX.addColumn(new Array(this.matrixX.array.length).fill(1));
-        this.matrixX.swapColumn(0, x.length);
+        this.matrixX = this.tX.transpose();
 
-        // transpose X
-        this.tX = this.matrixX.transpose();
         // Xt * X
         this.tXX = this.tX.multiply(this.matrixX);
         // inverse (Xt * X)
@@ -30,6 +25,7 @@ module.exports =  class MLRServer {
 
         this.fillPredictY();
 
+        // Graph properties
         this.predictColor = '#ff0000';
         this.realColor = '#0000ff';
         this.realRadius = 2;
@@ -118,36 +114,6 @@ module.exports =  class MLRServer {
         if (arrayLength !== y.length) {
             throw new Error('The array Y must be the same size as array X.');
         }
-    }
-
-    /**
-     * Derive an equation with substituted coefficients only.
-     *
-     * @return{string} y Equation.
-     */
-    get formula() {
-        let string = `y = ${this.matrixK.array[0]}`;
-        for (let i = 1; i < this.matrixK.array.length; ++i) {
-            string += ` + ${this.matrixK.array[i]}*x${i}`
-        }
-        return string;
-    }
-
-    /**
-     * Derive an equation with substituted x's and coefficients.
-     *
-     * @param{array} x The array of observed data.
-     *
-     * @return{string} y Equation.
-     */
-    equation(x) {
-        let y = `${this.predict(x)} = ${this.matrixK.array[0]}`;
-
-        for (let i = 1; i < this.matrixK.array.length; ++i) {
-            y += ` + ${this.matrixK.array[i]}*${x[i - 1]}`
-        }
-
-        return y;
     }
 
     /**
